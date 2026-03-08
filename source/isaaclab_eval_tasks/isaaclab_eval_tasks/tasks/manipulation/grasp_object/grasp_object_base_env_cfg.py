@@ -13,10 +13,9 @@ from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
 import isaaclab.envs.mdp as base_mdp
-import isaaclab_tasks.manager_based.manipulation.pick_place.mdp as task_mdp
 from isaaclab_eval_tasks.tasks.manipulation.mdp import is_object_lifted
 
-from isaaclab_tasks.manager_based.manipulation.pick_place.exhaustpipe_gr1t2_base_env_cfg import ObjectTableSceneCfg, PickPlaceGR1T2EnvCfg, TerminationsCfg, EventCfg, ObservationsCfg
+from isaaclab_eval_tasks.tasks.manipulation.shared_base_env_cfg import ObjectTableSceneCfg, PickPlaceGR1T2EnvCfg, TerminationsCfg, EventCfg, ObservationsCfg
 
 @configclass
 class GraspObjectSceneCfg(ObjectTableSceneCfg):
