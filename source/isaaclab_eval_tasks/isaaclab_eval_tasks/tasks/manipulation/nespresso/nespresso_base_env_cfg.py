@@ -1,10 +1,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, RigidObjectCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import UsdFileCfg
 from isaaclab.utils import configclass
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.managers import EventTermCfg as EventTerm
@@ -23,31 +25,53 @@ class NespressoSceneCfg(ObjectTableSceneCfg):
     # Remove generic object
     object = None
 
-    # Coffee pod (small cylinder)
-    pod = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Pod",
-        init_state=RigidObjectCfg.InitialStateCfg(pos=[-0.45, 0.45, 0.85], rot=[1, 0, 0, 0]),
-        spawn=sim_utils.CylinderCfg(
+    try:
+        pod_spawn_cfg = UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/K_Cup/k_cup.usd",
+            scale=(1.0, 1.0, 1.0),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+        )
+    except Exception:
+        pod_spawn_cfg = sim_utils.CylinderCfg(
             radius=0.02,
             height=0.03,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.05),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.3, 0.1, 0.1)),
-        ),
+        )
+
+    # Coffee pod (small cylinder)
+    pod = RigidObjectCfg(
+        prim_path="{ENV_REGEX_NS}/Pod",
+        init_state=RigidObjectCfg.InitialStateCfg(pos=[-0.45, 0.45, 0.85], rot=[1, 0, 0, 0]),
+        spawn=pod_spawn_cfg,
     )
 
-    # Nespresso Machine (box)
-    machine = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Machine",
-        init_state=RigidObjectCfg.InitialStateCfg(pos=[0.0, 0.5, 0.85], rot=[1, 0, 0, 0]),
-        spawn=sim_utils.CuboidCfg(
+    try:
+        machine_spawn_cfg = UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Coffee_Maker/coffee_maker.usd",
+            scale=(1.0, 1.0, 1.0),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
+            mass_props=sim_utils.MassPropertiesCfg(mass=3.0),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+        )
+    except Exception:
+        machine_spawn_cfg = sim_utils.CuboidCfg(
             size=(0.15, 0.25, 0.3),
             rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
             mass_props=sim_utils.MassPropertiesCfg(mass=3.0),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.1, 0.1, 0.1)),
-        ),
+        )
+
+    # Nespresso Machine (box)
+    machine = RigidObjectCfg(
+        prim_path="{ENV_REGEX_NS}/Machine",
+        init_state=RigidObjectCfg.InitialStateCfg(pos=[0.0, 0.5, 0.85], rot=[1, 0, 0, 0]),
+        spawn=machine_spawn_cfg,
     )
 
     # Lever (small cylinder sticking out, assumed rigid body for simplicity of generic primitive representation)

@@ -1,10 +1,12 @@
 # SPDX-FileCopyrightText: Copyright (c) 2025 NVIDIA CORPORATION & AFFILIATES. All rights reserved.
 # SPDX-License-Identifier: Apache-2.0
 
+import os
 import isaaclab.sim as sim_utils
 from isaaclab.assets import AssetBaseCfg, RigidObjectCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import UsdFileCfg
 from isaaclab.utils import configclass
+from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.managers import EventTermCfg as EventTerm
@@ -23,32 +25,54 @@ class WaterPlantSceneCfg(ObjectTableSceneCfg):
     # Remove the generic 'object' from the base class
     object = None
 
-    # Watering can (e.g. cylinder with offset handle)
-    watering_can = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/WateringCan",
-        init_state=RigidObjectCfg.InitialStateCfg(pos=[-0.45, 0.45, 0.9], rot=[1, 0, 0, 0]),
-        spawn=sim_utils.CylinderCfg(
+    try:
+        watering_can_spawn_cfg = UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Kettle/kettle.usd", # Using a kettle as a watering can proxy
+            scale=(1.0, 1.0, 1.0),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
+            mass_props=sim_utils.MassPropertiesCfg(mass=0.3),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+        )
+    except Exception:
+        watering_can_spawn_cfg = sim_utils.CylinderCfg(
             radius=0.06,
             height=0.15,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
             mass_props=sim_utils.MassPropertiesCfg(mass=0.3),
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.1, 0.8, 0.1)),
-        ),
+        )
+
+    # Watering can (e.g. cylinder with offset handle)
+    watering_can = RigidObjectCfg(
+        prim_path="{ENV_REGEX_NS}/WateringCan",
+        init_state=RigidObjectCfg.InitialStateCfg(pos=[-0.45, 0.45, 0.9], rot=[1, 0, 0, 0]),
+        spawn=watering_can_spawn_cfg,
     )
 
-    # Plant (e.g. larger cylinder)
-    plant = RigidObjectCfg(
-        prim_path="{ENV_REGEX_NS}/Plant",
-        init_state=RigidObjectCfg.InitialStateCfg(pos=[0.0, 0.5, 0.85], rot=[1, 0, 0, 0]),
-        spawn=sim_utils.CylinderCfg(
+    try:
+        plant_spawn_cfg = UsdFileCfg(
+            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Potted_Plant/potted_plant.usd",
+            scale=(1.0, 1.0, 1.0),
+            rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
+            mass_props=sim_utils.MassPropertiesCfg(mass=2.0),
+            collision_props=sim_utils.CollisionPropertiesCfg(),
+        )
+    except Exception:
+        plant_spawn_cfg = sim_utils.CylinderCfg(
             radius=0.15,
             height=0.2,
             rigid_props=sim_utils.RigidBodyPropertiesCfg(max_depenetration_velocity=1.0),
             mass_props=sim_utils.MassPropertiesCfg(mass=2.0), # Heavy so it's not easily knocked over
             collision_props=sim_utils.CollisionPropertiesCfg(),
             visual_material=sim_utils.PreviewSurfaceCfg(diffuse_color=(0.2, 0.5, 0.2)),
-        ),
+        )
+
+    # Plant (e.g. larger cylinder)
+    plant = RigidObjectCfg(
+        prim_path="{ENV_REGEX_NS}/Plant",
+        init_state=RigidObjectCfg.InitialStateCfg(pos=[0.0, 0.5, 0.85], rot=[1, 0, 0, 0]),
+        spawn=plant_spawn_cfg,
     )
 
 @configclass
