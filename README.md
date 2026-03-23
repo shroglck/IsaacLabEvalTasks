@@ -48,6 +48,10 @@ The task is defined as successful if following criteria has been met.
 1. The blue exhaust pipe is placed in the correct position
 
 
+## 📦 Adding Custom Objects (Optional)
+
+For detailed instructions on how to use custom 3D assets (e.g., Objaverse or other custom USDs) in the evaluation tasks, see the [Custom Objects Guide](doc/custom_objects.md).
+
 ## 📦 Downloading Datasets (Optional)
 
 For dataset information and download instructions, see [Datasets Guide](doc/datasets.md).
